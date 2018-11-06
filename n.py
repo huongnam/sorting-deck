@@ -4,18 +4,6 @@ import sys
 import random
 
 
-parser = argparse.ArgumentParser()
-parser.add_argument('--algo', help='specify which algorithm to use for\
-                   sorting among [bubble|insert|quick|merge], default bubble',
-                   type=str, default='bubble')
-parser.add_argument('--gui', help='visualise the algorithm in GUI mode',
-                   action='store_true')
-parser.add_argument('N', help='an integer for the list to sort', type=int,
-                   nargs='+')
-args = parser.parse_args()
-lst = args.N
-algo = args.algo
-
 def check(lst):
     boolist = []
     for i in range(len(lst) - 1):
@@ -68,6 +56,18 @@ def quick_sort(lst):
 
 def main():
 
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--algo', help='specify which algorithm to use for\
+                       sorting among [bubble|insert|quick|merge], default bubble',
+                       type=str, default='bubble')
+    parser.add_argument('--gui', help='visualise the algorithm in GUI mode',
+                       action='store_true')
+    parser.add_argument('N', help='an integer for the list to sort', type=int,
+                       nargs='+')
+    args = parser.parse_args()
+    lst = args.N
+    algo = args.algo
+
     if args.gui and len(lst) > 15:
         too_large()
         exit()
@@ -81,3 +81,4 @@ def main():
             insertion_sort(lst)
         if args.algo == 'quick':
             print(quick_sort(lst))
+main()
