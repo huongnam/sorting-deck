@@ -22,11 +22,9 @@ def too_large():
 def bubble_sort(lst):
     for i in range(len(lst)):
         for j in range(0, len(lst) - 1 - i):
-            if lst[j] > lst[j+1] :
+            if lst[j] > lst[j+1]:
                 lst[j], lst[j+1] = lst[j+1], lst[j]
-                for item in lst:
-                    sys.stdout.write(str(item) + ' ')
-                sys.stdout.write('\n')
+                print(' '.join(str(x) for x in lst))
 
 
 def insertion_sort(lst):
@@ -38,7 +36,7 @@ def insertion_sort(lst):
                 i -= 1
                 nam = True
         lst[i] = cur
-        if nam == True:
+        if nam is True:
             print(' '.join(str(x) for x in lst))
 
 # def quick_sort(lst):
@@ -49,6 +47,7 @@ def insertion_sort(lst):
 #     head = quick_sort([elem for elem in lst if elem < pivot])
 #     tail = quick_sort([elem for elem in lst if elem > pivot])
 #     return head + [elem for elem in lst if elem == pivot] + tail
+
 
 def partition(arr, low, high):
     i = (low - 1)
@@ -97,17 +96,16 @@ def merge_sort(lst):
         print(' '.join(str(x) for x in lst))
 
 
-
 def main():
 
     parser = argparse.ArgumentParser()
     parser.add_argument('--algo', help='specify which algorithm to use for\
-                       sorting among [bubble|insert|quick|merge], default bubble',
-                       type=str, default='bubble')
+                       sorting among [bubble|insert|quick|merge],\
+                        default bubble', type=str, default='bubble')
     parser.add_argument('--gui', help='visualise the algorithm in GUI mode',
-                       action='store_true')
+                        action='store_true')
     parser.add_argument('N', help='an integer for the list to sort', type=int,
-                       nargs='+')
+                        nargs='+')
     args = parser.parse_args()
     lst = args.N
     algo = args.algo
@@ -116,8 +114,12 @@ def main():
         too_large()
         exit()
     if check(lst) == 'Sorted':
-        print()
-        exit()
+        if args.algo == 'merge':
+            merge_sort(lst)
+        if args.algo == 'quick':
+            quick_sort(lst, 0, len(lst) - 1)
+        else:
+            exit()
     else:
         if args.algo == 'bubble':
             bubble_sort(lst)
@@ -128,4 +130,6 @@ def main():
         if args.algo == 'merge':
             merge_sort(lst)
 
-main()
+
+if __name__ == '__main__':
+    main()
