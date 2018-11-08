@@ -2,7 +2,8 @@
 import argparse
 import sys
 import random
-
+import pyglet
+from pyglet.gl import *
 
 def check(lst):
     boolist = []
@@ -96,6 +97,22 @@ def merge_sort(lst):
         print(' '.join(str(x) for x in lst))
 
 
+width = 1280
+height = 720
+window = pyglet.window.Window(width, height)
+shirt_image = pyglet.image.load("resources/shirt.png")
+shirt = pyglet.sprite.Sprite(img=shirt_image)
+campnou = pyglet.image.load("resources/campnou.jpg")
+
+
+
+@window.event
+def on_draw():
+    window.clear()
+    campnou.blit(0, 0, width=window.width, height=window.height)
+    shirt.draw()
+
+
 def main():
 
     parser = argparse.ArgumentParser()
@@ -133,3 +150,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+    pyglet.app.run()
