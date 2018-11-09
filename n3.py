@@ -38,10 +38,14 @@ def too_large():
 
 
 def bubble_sort(lst):
+    global result
+    result = []
+    result.append(' '.join(str(x) for x in lst))
     for i in range(len(lst)):
         for j in range(0, len(lst) - 1 - i):
             if lst[j] > lst[j+1]:
                 lst[j], lst[j+1] = lst[j+1], lst[j]
+                result.append(' '.join(str(x) for x in lst))
                 print(' '.join(str(x) for x in lst))
 
 
@@ -113,35 +117,75 @@ def merge_sort(lst):
             k += 1
         print(' '.join(str(x) for x in lst))
 
-
+lst, args = do_argparse()
 width = 1280
 height = 720
 window = pyglet.window.Window(width, height)
-def make_object():
-    
-    shirt_image = pyglet.image.load("resources/shirt.jpeg")
-    shirt = pyglet.sprite.Sprite(img=shirt_image)
-    shirt.scale = 0.1
-    shirts = pyglet.graphics.Batch()
-    campnou = pyglet.image.load("resources/campnou.jpg")
-    shirt_list = []
-    for i in range(len(lst)):
-        x, y = i * 10, 50
-        print("ha")
-        shirt_list.append(pyglet.sprite.Sprite(shirt_image, x, y, batch=shirts))
-    for i in range(len(lst)):
-        shirt_list[i].scale = 0.1
-    print(shirt_list)
-    return shirts, campnou, shirt
+shirt_image = pyglet.image.load("resources/shirt3.png")
+shirt = pyglet.sprite.Sprite(img=shirt_image)
+shirt.scale = 0.1
+# batch = pyglet.graphics.Batch()
+# group0 = pyglet.graphics.OrderedGroup(0)
+# group1 = pyglet.graphics.OrderedGroup(1)
+shirts = pyglet.graphics.Batch()
+texts = pyglet.graphics.Batch()
+campnou = pyglet.image.load("resources/campnou.jpg")
+shirt_list = []
+zoom = (1 / len(lst))
+print(zoom)
+for i in range(len(lst)):
+    x, y = i * 180, window.height // 4
+    shirt_list.append(pyglet.sprite.Sprite(shirt_image, x, y, batch=shirts))
+for i in range(len(lst)):
+    shirt_list[i].scale = zoom
+print(width // len(lst))
+print("ha")
+text_list = []
+for i in range(len(lst)):
+    text_list.append(pyglet.text.Label(text="%s" % lst[i], x=i * 180 + 65,
+                                 y=window.height // 2.8, color = (255,255,255,255),
+                                 font_size = 35, anchor_x='center', anchor_y='center', batch=texts))
 
+
+old_lst = lst
+
+def update(dt):
+    if args.algo == 'bubble':
+        bubble_sort(lst)
+    print("nam")
+    print(old_lst)
+    print("nam")
+    if result != []:
+        print(result)
+        for j in range(len(result)-1):
+            result[j] = result[j].split()
+            old_line = result[j]
+            new_line = result[j+1].split()
+            print(old_line)
+            print("nam2")
+            print(new_line)
+
+    #         old_line = old_line.split()
+    #         for i in range(len(result[j])):
+    #             if old_line[i] != result[j][i]:
+    #                 print(old_line[i])
+    #                 print(result[j][i])
+    #                 print("ja")
+    # print(lst)
+            for i in range(len(new_line)):
+                if new_line[i] != old_line[i]:
+                    print(old_line[i])
+                    print("nam3")
+                    print(new_line[i])
+                    texts[i].y += 5
 @window.event
 def on_draw():
-    shirts, campnou, shirt = make_object(lst)
     window.clear()
-    # shirts.draw()
-    campnou.blit(0, 0, width=window.width, height=window.height)
 
+    campnou.blit(0, 0, width=window.width, height=window.height)
     shirts.draw()
+    texts.draw()
+    # batch.draw()
 
 
 def main():
@@ -158,8 +202,8 @@ def main():
         else:
             exit()
     else:
-        if args.algo == 'bubble':
-            bubble_sort(lst)
+        # if args.algo == 'bubble':
+        #     bubble_sort(lst)
         if args.algo == 'insert':
             insertion_sort(lst)
         if args.algo == 'quick':
@@ -170,4 +214,5 @@ def main():
 
 if __name__ == '__main__':
     main()
+    pyglet.clock.schedule_interval(update, 2)
     pyglet.app.run()

@@ -3,7 +3,10 @@ import argparse
 import sys
 import random
 import pyglet
+from pyglet.window import key
 from pyglet.gl import *
+import time
+
 
 def do_argparse():
     parser = argparse.ArgumentParser()
@@ -38,10 +41,12 @@ def too_large():
 
 
 def bubble_sort(lst):
+    result.append(list(lst))
     for i in range(len(lst)):
         for j in range(0, len(lst) - 1 - i):
             if lst[j] > lst[j+1]:
                 lst[j], lst[j+1] = lst[j+1], lst[j]
+                result.append(list(lst))
                 print(' '.join(str(x) for x in lst))
 
 
@@ -56,15 +61,6 @@ def insertion_sort(lst):
         lst[i] = cur
         if nam is True:
             print(' '.join(str(x) for x in lst))
-
-# def quick_sort(lst):
-#     if not lst:
-#         return lst
-#     pivot = lst[random.randint(0, len(lst) - 1)]
-#     print(pivot)
-#     head = quick_sort([elem for elem in lst if elem < pivot])
-#     tail = quick_sort([elem for elem in lst if elem > pivot])
-#     return head + [elem for elem in lst if elem == pivot] + tail
 
 
 def partition(arr, low, high):
@@ -113,40 +109,54 @@ def merge_sort(lst):
             k += 1
         print(' '.join(str(x) for x in lst))
 
-
+lst, args = do_argparse()
 width = 1280
 height = 720
 window = pyglet.window.Window(width, height)
-def make_object():
-    
-    shirt_image = pyglet.image.load("resources/shirt.jpeg")
+shirt_image = pyglet.image.load("resources/shirt3.png")
+shirt_list = []
+for i in range(len(lst)):
     shirt = pyglet.sprite.Sprite(img=shirt_image)
-    shirt.scale = 0.1
-    shirts = pyglet.graphics.Batch()
-    campnou = pyglet.image.load("resources/campnou.jpg")
-    shirt_list = []
-    for i in range(len(lst)):
-        x, y = i * 10, 50
-        print("ha")
-        shirt_list.append(pyglet.sprite.Sprite(shirt_image, x, y, batch=shirts))
-    for i in range(len(lst)):
-        shirt_list[i].scale = 0.1
-    print(shirt_list)
-    return shirts, campnou, shirt
+    shirt.x = i * 200
+    shirt.y = window.height // 4
+    shirt.scale = 1 / 7
+    shirt_list.append(shirt)
+campnou = pyglet.image.load("resources/campnou.jpg")
+
+i = 0
+labels = []
+
+def update(dt):
+    global i
+    if i < len(result):
+        for j in range(len(result[i])):
+            label = pyglet.text.Label(str(result[i][j]),
+                                      font_size = 35,
+                                      x=j * 200 + 65, y=window.height // 2.8,
+                                      anchor_x='center', anchor_y='center')
+            if i > 0 and result[i][j] != result[i-1][j]:
+                label.color = (0, 255, 0, 255)
+            labels.append(label)
+        i += 1
+
 
 @window.event
 def on_draw():
-    shirts, campnou, shirt = make_object(lst)
+    global labels
     window.clear()
-    # shirts.draw()
     campnou.blit(0, 0, width=window.width, height=window.height)
 
-    shirts.draw()
-
+    for i in shirt_list:
+        i.draw()
+    if len(labels) > 0:
+        for label in labels:
+            label.draw()
+    labels = []
 
 def main():
+    global result
+    result = []
     lst, args = do_argparse()
-
     if args.gui and len(lst) > 15:
         too_large()
         exit()
@@ -170,4 +180,5 @@ def main():
 
 if __name__ == '__main__':
     main()
+    pyglet.clock.schedule_interval(update, 0.5)
     pyglet.app.run()
