@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 import argparse
 import sys
-import random
 import pyglet
+from pyglet.window import key
 from pyglet.gl import *
+
 
 def do_argparse():
     parser = argparse.ArgumentParser()
@@ -18,7 +19,6 @@ def do_argparse():
     global lst
     args = parser.parse_args()
     lst = args.N
-
     return lst, args
 
 
@@ -38,10 +38,12 @@ def too_large():
 
 
 def bubble_sort(lst):
+    result.append(list(lst))
     for i in range(len(lst)):
         for j in range(0, len(lst) - 1 - i):
             if lst[j] > lst[j+1]:
                 lst[j], lst[j+1] = lst[j+1], lst[j]
+                result.append(list(lst))
                 print(' '.join(str(x) for x in lst))
 
 
@@ -57,34 +59,25 @@ def insertion_sort(lst):
         if nam is True:
             print(' '.join(str(x) for x in lst))
 
-# def quick_sort(lst):
-#     if not lst:
-#         return lst
-#     pivot = lst[random.randint(0, len(lst) - 1)]
-#     print(pivot)
-#     head = quick_sort([elem for elem in lst if elem < pivot])
-#     tail = quick_sort([elem for elem in lst if elem > pivot])
-#     return head + [elem for elem in lst if elem == pivot] + tail
 
-
-def partition(arr, low, high):
+def partition(lst, low, high):
     i = (low - 1)
-    pivot = arr[high]
+    pivot = lst[high]
     for j in range(low, high):
-        if arr[j] <= pivot:
+        if lst[j] <= pivot:
             i += 1
-            arr[i], arr[j] = arr[j], arr[i]
-    arr[i + 1], arr[high] = arr[high], arr[i + 1]
+            lst[i], lst[j] = lst[j], lst[i]
+    lst[i + 1], lst[high] = lst[high], lst[i + 1]
     print('P:', pivot)
-    print(' '.join(str(x) for x in arr))
+    print(' '.join(str(x) for x in lst))
     return (i + 1)
 
 
-def quick_sort(arr, low, high):
+def quick_sort(lst, low, high):
     if low < high:
-        pi = partition(arr, low, high)
-        quick_sort(arr, low, pi-1)
-        quick_sort(arr, pi+1, high)
+        pivot = partition(lst, low, high)
+        quick_sort(lst, low, pivot-1)
+        quick_sort(lst, pivot+1, high)
 
 
 def merge_sort(lst):
@@ -114,39 +107,58 @@ def merge_sort(lst):
         print(' '.join(str(x) for x in lst))
 
 
-width = 1280
-height = 720
+lst, args = do_argparse()
+width = 1800
+height = 800
 window = pyglet.window.Window(width, height)
-def make_object():
-    
-    shirt_image = pyglet.image.load("resources/shirt.jpeg")
+shirt_image = pyglet.image.load("resources/shirt3.png")
+shirt_list = []
+for i in range(len(lst)):
     shirt = pyglet.sprite.Sprite(img=shirt_image)
-    shirt.scale = 0.1
-    shirts = pyglet.graphics.Batch()
-    campnou = pyglet.image.load("resources/campnou.jpg")
-    shirt_list = []
-    for i in range(len(lst)):
-        x, y = i * 10, 50
-        print("ha")
-        shirt_list.append(pyglet.sprite.Sprite(shirt_image, x, y, batch=shirts))
-    for i in range(len(lst)):
-        shirt_list[i].scale = 0.1
-    print(shirt_list)
-    return shirts, campnou, shirt
+    shirt.x = i * window.width / len(lst)
+    shirt.y = window.height // 8
+    shirt.scale = 2 / len(lst)
+    shirt_list.append(shirt)
+campnou = pyglet.image.load("resources/campnou.jpg")
+i = 0
+labels = []
+
+
+def update(dt):
+    global i
+    if i < len(result):
+        for j in range(len(result[i])):
+            label = pyglet.text.Label(str(result[i][j]),
+                                      font_size=500 / len(lst),
+                                      x=shirt_list[j].x + 480 * (2 / len(lst)),
+                                      y=shirt_list[j].y + 480 * (2 / len(lst)),
+                                      anchor_x='center', anchor_y='center')
+            # change color if there is swap:
+            if i > 0 and result[i][j] != result[i-1][j]:
+                label.color = (29, 225, 50, 255)
+            # change the final color when finish sorting:
+            if i == len(result) - 1:
+                label.color = (170, 255, 255, 255)
+            labels.append(label)
+        i += 1
+
 
 @window.event
 def on_draw():
-    shirts, campnou, shirt = make_object(lst)
-    window.clear()
-    # shirts.draw()
-    campnou.blit(0, 0, width=window.width, height=window.height)
-
-    shirts.draw()
+    global labels
+    if len(labels) > 0:
+        campnou.blit(0, 0, width=window.width, height=window.height)
+        for i in shirt_list:
+            i.draw()
+        for label in labels:
+            label.draw()
+    labels = []
 
 
 def main():
+    global result
+    result = []
     lst, args = do_argparse()
-
     if args.gui and len(lst) > 15:
         too_large()
         exit()
@@ -170,4 +182,6 @@ def main():
 
 if __name__ == '__main__':
     main()
-    pyglet.app.run()
+    if args.gui:
+        pyglet.clock.schedule_interval(update, 0.75)
+        pyglet.app.run()

@@ -236,10 +236,10 @@ def update(dt):
                     # print("nam8")
                     # print(text_list)
                     # print("nam8")
-                    text_list = str(text_list)
-                    text_list.rsplit(sep=',')
-                    text_list
-                    print(text_list)
+                    # text_list = str(text_list)
+                    # text_list.rsplit(sep=',')
+                    # text_list
+                    # print(text_list)
                     flag = True
                     break
             if flag:
